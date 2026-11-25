@@ -69,7 +69,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 ## npm Commands
 
-- Use public npm (`https://registry.npmjs.org/`) for cloud dependency operations. Keep committed lockfile tarball URLs on public npm, and reject other origins in CI.
+- Use the internal npm feed (`https://packagefeedproxy.microsoft.io/npm/`) for dependency operations, as configured in `.npmrc`. Keep committed lockfile tarball URLs under that feed, and reject other URLs in CI. Do not commit feed credentials.
 - Development commands are defined in `package.json`. They run Astro for the site and TypeScript tasks in `db/` for database setup.
 - **Skills take precedence.** Before running a command directly, check whether a skill covers the task (e.g. the `quality-checks` skill wraps unit tests, lint, and type checks). If one applies, follow it.
 - Key npm scripts:
