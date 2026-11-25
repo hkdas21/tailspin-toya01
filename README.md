@@ -12,6 +12,8 @@ Tailspin Toys is a crowdfunding platform for games with a developer theme. The p
 
 Development commands are defined in `package.json`: npm runs Astro for the dev server, static build, and preview. The `predev` and `prebuild` npm hooks run the TypeScript database migration and seed tasks in `db/`, writing to the gitignored `tailspin.db` file.
 
+Game cards on the list page show each game's rating out of 5, or "No rating yet" when its rating is null.
+
 ## Using this template
 
 This repository is a GitHub template. When you create a new repository from it, a one-time **Bootstrap template issues** workflow (`.github/workflows/bootstrap-issues.yml`) runs automatically on the first push to `main` and opens a set of starter issues describing suggested first features. Each issue is defined by a Markdown file in `.github/bootstrap-issues/` — the first heading becomes the issue title and the remaining content becomes the body — so you can edit, add, or remove files there to control which issues are created.
@@ -33,7 +35,11 @@ npx playwright install chromium   # only needed to run the E2E tests
 
 ### npm registry
 
-Cloud dependency installation uses [public npm](https://registry.npmjs.org/). GitHub Actions and Copilot setup set `NPM_CONFIG_REGISTRY` to public npm. Committed lockfiles must contain only public npm tarball URLs; CI rejects other tarball origins.
+Dependency installation uses the [internal npm feed](https://packagefeedproxy.microsoft.io/npm/), configured in the project [`.npmrc`](.npmrc). This setting applies to `npm ci`, `npm install`, and `npx`; `package.json` keeps its existing dependency version ranges. GitHub Actions, Copilot setup, and Dependabot use the same feed. Committed lockfiles must contain only tarball URLs under this feed; CI rejects other URLs.
+
+Local machines, CI runners, and Dependabot must have network access to the feed. If authentication is required, configure credentials outside the repository; never commit tokens. An existing `NPM_CONFIG_REGISTRY` environment variable or command-line `--registry` option overrides `.npmrc`, so remove or update any public-registry override.
+
+This project has no Python or NuGet dependencies, so no PyPI or NuGet configuration is needed.
 
 ## Launch the site
 

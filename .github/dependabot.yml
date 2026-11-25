@@ -7,9 +7,16 @@
 #
 # Learn more at https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#configuration-options-for-the-dependabotyml-file
 version: 2
+registries:
+  internal-npm:
+    type: npm-registry
+    url: https://packagefeedproxy.microsoft.io/npm/
+    replaces-base: true
 updates:
   - package-ecosystem: npm
     directory: /
+    registries:
+      - internal-npm
     schedule:
       interval: weekly
     # Wait 7 days after a version is published before proposing it, so freshly
