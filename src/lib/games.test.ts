@@ -6,6 +6,7 @@ import {
     getAllGames,
     getAllGameIds,
     getGameById,
+    type GameFilters,
 } from './games';
 
 async function seedGames(db: Database, count: number): Promise<void> {
@@ -62,5 +63,46 @@ describe('games data-access helpers', () => {
     it('returns null for a non-existent game', async () => {
         await seedGames(db, 2);
         expect(await getGameById(db, 99999)).toBeNull();
+    });
+
+    describe('filtering', () => {
+        beforeEach(async () => {
+            await db.insert(categories).values([
+                { id: 1, name: 'Strategy' },
+                { id: 2, name: 'Puzzle' },
+            ]);
+            await db.insert(publishers).values([
+                { id: 1, name: 'Pub One' },
+                { id: 2, name: 'Pub Two' },
+            ]);
+            await db.insert(games).values([
+                { title: 'Zulu', description: 'Strategy two', categoryId: 1, publisherId: 2 },
+                { title: 'Beta', description: 'Puzzle one', categoryId: 2, publisherId: 1 },
+                { title: 'Alpha', description: 'Strategy one', categoryId: 1, publisherId: 1 },
+            ]);
+        });
+
+        it.each<{ scenario: string; filters: GameFilters; titles: string[] }>([
+            { scenario: 'empty filters', filters: {}, titles: ['Alpha', 'Beta', 'Zulu'] },
+            { scenario: 'empty categories', filters: { categoryIds: [] }, titles: ['Alpha', 'Beta', 'Zulu'] },
+            { scenario: 'one category', filters: { categoryIds: [1] }, titles: ['Alpha', 'Zulu'] },
+            { scenario: 'several categories', filters: { categoryIds: [1, 2] }, titles: ['Alpha', 'Beta', 'Zulu'] },
+            { scenario: 'publisher only', filters: { publisherId: 1 }, titles: ['Alpha', 'Beta'] },
+            { scenario: 'combined constraints', filters: { categoryIds: [1], publisherId: 1 }, titles: ['Alpha'] },
+            { scenario: 'multiple categories and publisher', filters: { categoryIds: [1, 2], publisherId: 1 }, titles: ['Alpha', 'Beta'] },
+            { scenario: 'empty categories and publisher', filters: { categoryIds: [], publisherId: 2 }, titles: ['Zulu'] },
+            { scenario: 'no matching combination', filters: { categoryIds: [2], publisherId: 2 }, titles: [] },
+            { scenario: 'unknown category', filters: { categoryIds: [999] }, titles: [] },
+            { scenario: 'unknown publisher', filters: { publisherId: 999 }, titles: [] },
+            { scenario: 'unknown category alongside a known category', filters: { categoryIds: [999, 2] }, titles: ['Beta'] },
+        ])('returns ordered matches for $scenario', async ({ filters, titles }) => {
+            const matches = await getAllGames(db, filters);
+            expect(matches.map((game) => game.title)).toEqual(titles);
+        });
+    });
+
+    it('returns no games from an empty database with or without filters', async () => {
+        expect(await getAllGames(db)).toEqual([]);
+        expect(await getAllGames(db, { categoryIds: [1], publisherId: 1 })).toEqual([]);
     });
 });

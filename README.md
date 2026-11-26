@@ -14,6 +14,14 @@ Development commands are defined in `package.json`: npm runs Astro for the dev s
 
 Game cards on the list page show each game's rating out of 5, or "No rating yet" when its rating is null.
 
+### Filtering the catalog
+
+Select one or more category checkboxes to see games in any selected category, or select a publisher to see its games. Category and publisher filters combine: games must match both when both are selected. Results update immediately, with a result count and a message when nothing matches. **Clear filters** restores all games.
+
+Filters default to all games, and selections last only on the current page (they are not saved in the URL or across reloads). A small Astro browser script filters the build-time HTML; no runtime API is required. Without JavaScript, the complete catalog remains browsable and filter controls stay hidden.
+
+Build-time callers can use `getAllGames(db, { categoryIds: [1, 2], publisherId: 3 })`. Both fields are optional; an empty category list imposes no category constraint. Results remain ordered by title.
+
 ## Using this template
 
 This repository is a GitHub template. When you create a new repository from it, a one-time **Bootstrap template issues** workflow (`.github/workflows/bootstrap-issues.yml`) runs automatically on the first push to `main` and opens a set of starter issues describing suggested first features. Each issue is defined by a Markdown file in `.github/bootstrap-issues/` — the first heading becomes the issue title and the remaining content becomes the body — so you can edit, add, or remove files there to control which issues are created.
