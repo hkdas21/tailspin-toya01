@@ -1,0 +1,52 @@
+---
+import type { Category, Publisher } from '../types/game';
+
+/** Filter options derived from the complete build-time catalog. */
+interface Props {
+    /** Unique categories in display order; each ID becomes a checkbox value. */
+    categories: Category[];
+    /** Unique publishers in display order; each ID becomes a select option value. */
+    publishers: Publisher[];
+}
+
+const { categories, publishers } = Astro.props;
+---
+
+<form id="game-filters" aria-label="Filter games" class="mb-6 rounded-xl border border-slate-700 bg-slate-800 p-6" hidden>
+    <fieldset class="mb-4">
+        <legend class="mb-2 font-medium text-slate-100">Categories</legend>
+        <div class="flex flex-wrap gap-x-6 gap-y-3">
+            {categories.map((category) => (
+                <label class="flex items-center gap-2 text-slate-200">
+                    <input
+                        type="checkbox"
+                        name="category"
+                        value={category.id}
+                        class="h-4 w-4 accent-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        data-testid={`category-filter-${category.id}`}
+                    />
+                    {category.name}
+                </label>
+            ))}
+        </div>
+    </fieldset>
+    <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-end">
+        <div class="w-full sm:w-auto">
+            <label for="publisher-filter" class="mb-2 block font-medium text-slate-100">Publisher</label>
+            <select
+                id="publisher-filter"
+                name="publisher"
+                class="w-full rounded-lg border border-slate-600 bg-slate-900 p-2 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                data-testid="publisher-filter"
+            >
+                <option value="">All publishers</option>
+                {publishers.map((publisher) => <option value={publisher.id}>{publisher.name}</option>)}
+            </select>
+        </div>
+        <button
+            type="reset"
+            class="rounded-lg bg-slate-700 px-4 py-2 text-slate-100 hover:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            data-testid="clear-filters"
+        >Clear filters</button>
+    </div>
+</form>

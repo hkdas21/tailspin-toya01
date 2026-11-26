@@ -36,11 +36,13 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 - Use TypeScript with explicit types for function parameters and return values, especially in the data layer (`db/`, `src/lib/`)
 - Frontend code (TypeScript, Astro) must pass ESLint checks (`npm run lint`)
+- All new TypeScript should contain TSDocs comments for documentation purposes.
 
 ### Data Layer Patterns (Drizzle + Node SQLite)
 
 - Define tables in `db/schema.ts`; manage schema changes with drizzle-kit migrations - see `drizzle.instructions.md`
 - Keep data-access helpers in `src/lib/` with an **injectable `db`** argument so they're testable
+- `getAllGames(db, filters?)` supports optional `categoryIds` (OR; empty means all) and `publisherId` (AND). The home page filters prerendered cards with a scoped Astro script using the same semantics; do not introduce runtime database access. Keep filter controls hidden until initialized and preserve the full catalog without JavaScript.
 - Keep CSV/seed logic as pure functions in `db/transforms.ts`
 - Seed-derived values must be deterministic (no `Math.random`) so static builds are reproducible
 
